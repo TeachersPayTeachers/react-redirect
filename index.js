@@ -8,37 +8,42 @@ var _serverRedirect = null;
 function getRedirectFromPropsList(propsList) {
     var innermostProps = propsList[propsList.length - 1];
     if (innermostProps) {
-	return innermostProps.location;
+        return { location: innermostProps.location,
+                 isPermanent: innermostProps.isPermanent
+               };
     }
 }
 
 var WindowRedirect = createSideEffect(function handleChange(propsList) {
-	var location = getRedirectFromPropsList(propsList);
+    var props = getRedirectFromPropsList(propsList);
+    var location = props.location;
+    props.isPermanent = props.isPermanent || true;
 
-	if (typeof document !== 'undefined') {
-	    if (location)
-      window.location = location;
-	  } else {
-	    _serverRedirect = location || null;
-	}
-    }, {
-	displayName: 'WindowRedirect',
+    if (typeof document !== 'undefined') {
+        if (location)
+            window.location = location;
+    } else {
+        _serverRedirect = props || null;
+    }
+}, {
+    displayName: 'WindowRedirect',
 
-	propTypes: {
-	    location: React.PropTypes.string.isRequired
-	},
+    propTypes: {
+        location: React.PropTypes.string.isRequired,
+        isPermanent: React.PropTypes.bool
+    },
 
-	statics: {
-	    peek: function () {
-		return _serverRedirect;
-	    },
+    statics: {
+        peek: function () {
+            return _serverRedirect;
+        },
 
-	    rewind: function () {
-		var location = _serverRedirect;
-		this.dispose();
-		return location;
-	    }
-	}
-    });
+        rewind: function () {
+            var location = _serverRedirect;
+            this.dispose();
+            return location;
+        }
+    }
+});
 
 module.exports = WindowRedirect;
