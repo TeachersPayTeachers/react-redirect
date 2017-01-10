@@ -8,20 +8,19 @@ var _serverRedirect = null;
 function getRedirectFromPropsList(propsList) {
     var innermostProps = propsList[propsList.length - 1];
     if (innermostProps) {
-        return { location: innermostProps.location,
-                 isPermanent: innermostProps.isPermanent
-               };
+        return {
+            location: innermostProps.location,
+            isPermanent: innermostProps.isPermanent
+        };
     }
 }
 
 var WindowRedirect = createSideEffect(function handleChange(propsList) {
     var props = getRedirectFromPropsList(propsList);
-    var location = props.location;
-    props.isPermanent = props.isPermanent || true;
 
     if (typeof document !== 'undefined') {
-        if (location)
-            window.location = location;
+        if (props && props.location)
+            window.location = props.location;
     } else {
         _serverRedirect = props || null;
     }
@@ -39,7 +38,10 @@ var WindowRedirect = createSideEffect(function handleChange(propsList) {
         },
 
         rewind: function () {
-            var location = _serverRedirect;
+            var props = _serverRedirect;
+            if (props) {
+                props.isPermanent = props.isPermanent === true;
+            }
             this.dispose();
             return location;
         }
