@@ -22,6 +22,9 @@ var WindowRedirect = createSideEffect(function handleChange(propsList) {
         if (props && props.location)
             window.location = props.location;
     } else {
+        if (props) {
+            props.isPermanent = typeof props.isPermanent === 'boolean' ? props.isPermanent : true;
+        }
         _serverRedirect = props || null;
     }
 }, {
@@ -39,11 +42,8 @@ var WindowRedirect = createSideEffect(function handleChange(propsList) {
 
         rewind: function () {
             var props = _serverRedirect;
-            if (props) {
-                props.isPermanent = props.isPermanent === true;
-            }
             this.dispose();
-            return location;
+            return props;
         }
     }
 });
