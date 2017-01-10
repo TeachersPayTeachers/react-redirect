@@ -73,13 +73,22 @@ describe('ReactRedirect', function () {
 });
 
 describe('ReactRedirect.rewind', function () {
+  it('returns correct isPermanent flag', function () {
+      React.renderToStaticMarkup(
+          React.createElement(ReactRedirect, {location: 'a', isPermanent: true },
+                              React.createElement(ReactRedirect, {location: 'b' },
+                                                  React.createElement(ReactRedirect, {location: 'c', isPermanent: false}))
+                             )
+      );
+      expect(ReactRedirect.rewind().isPermanent).to.equal(false);
+  });
   it('clears the mounted instances', function () {
     React.renderToStaticMarkup(
       React.createElement(ReactRedirect, {location: 'a'},
         React.createElement(ReactRedirect, {location: 'b'}, React.createElement(ReactRedirect, {location: 'c'}))
       )
     );
-    expect(ReactRedirect.peek()).to.equal('c');
+    expect(ReactRedirect.peek().location).to.equal('c');
     ReactRedirect.rewind();
     expect(ReactRedirect.peek()).to.equal(null);
   });
@@ -90,7 +99,7 @@ describe('ReactRedirect.rewind', function () {
         React.createElement(ReactRedirect, {location: 'b'}, React.createElement(ReactRedirect, {location: location}))
       )
     );
-    expect(ReactRedirect.rewind()).to.equal(location);
+    expect(ReactRedirect.rewind().location).to.equal(location);
   });
   it('returns nothing if no mounted instances exist', function () {
     React.renderToStaticMarkup(
